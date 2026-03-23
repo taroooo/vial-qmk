@@ -28,12 +28,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     if (precision_active) {
-        mouse_report.x = mouse_report.x / 4;
-        mouse_report.y = mouse_report.y / 4;
+        static int16_t acc_x = 0;
+        static int16_t acc_y = 0;
+        acc_x += mouse_report.x;
+        acc_y += mouse_report.y;
+        mouse_report.x = acc_x / 4;
+        mouse_report.y = acc_y / 4;
+        acc_x -= mouse_report.x * 4;
+        acc_y -= mouse_report.y * 4;
     }
     if (ds_active) {
-        mouse_report.h = mouse_report.x / 8;
-        mouse_report.v = -mouse_report.y / 8;
+        static int16_t acc_h = 0;
+        static int16_t acc_v = 0;
+        acc_h += mouse_report.x;
+        acc_v += mouse_report.y;
+        mouse_report.h = acc_h / 8;
+        mouse_report.v = -(acc_v / 8);
+        acc_h -= mouse_report.h * 8;
+        acc_v -= (acc_v / 8) * 8;
         mouse_report.x = 0;
         mouse_report.y = 0;
     }
